@@ -25,7 +25,10 @@ namespace ThinkerThings.Service.Manager.User.Account.Infra.Repositories
             }
             catch (Exception ex)
             {
-                throw;
+                var exception = new Exception($"Falha ao obter usuário pelo documento: {documentNumber}. Erro: {ex.Message}", ex);
+
+                Logger.LogError(exception, ex.ToString());
+                throw exception;
             }
         }
 
@@ -90,9 +93,19 @@ namespace ThinkerThings.Service.Manager.User.Account.Infra.Repositories
 
         public async Task<IEnumerable<UserAccount>> GetUserAccounts()
         {
-            using (var conn = GetConnection())
+            try
             {
-                return await conn.QueryAsync<UserAccount>("SELECT * FROM USERACCOUNT WITH(NOLOCK)").ConfigureAwait(false);
+                using (var conn = GetConnection())
+                {
+                    return await conn.QueryAsync<UserAccount>("SELECT * FROM USERACCOUNT WITH(NOLOCK)").ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                var exception = new Exception($"Falha ao obter usuários. Erro: {ex.Message}", ex);
+
+                Logger.LogError(exception, ex.ToString());
+                throw exception;
             }
         }
 
